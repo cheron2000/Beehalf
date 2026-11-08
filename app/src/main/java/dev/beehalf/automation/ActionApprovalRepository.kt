@@ -39,15 +39,17 @@ class ActionApprovalRepository(
             is AutomationAction.OpenWebPage -> Triple("open_web_page", action.url, "")
             is AutomationAction.Unsupported -> error("Unsupported actions cannot enter the approval queue.")
         }
+        val expiresAt = Math.addExact(proposal.createdAtEpochMillis, expiryMillis)
+        require(expiresAt > now) { "Proposal has already expired." }
         val entity = ActionProposalEntity(
-            id = proposal.id.ifBlank { newId() },
+            id = proposal.id,
             actionType = payload.first,
             target = payload.second,
             detail = payload.third,
             summary = proposal.summary.trim(),
             status = ProposalStatus.PENDING.storageValue,
             createdAt = proposal.createdAtEpochMillis,
-            expiresAt = Math.addExact(now, expiryMillis),
+            expiresAt = expiresAt,
             decidedAt = null
         )
         dao.insertActionProposal(entity)
