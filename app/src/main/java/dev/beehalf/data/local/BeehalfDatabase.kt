@@ -8,8 +8,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [ConversationEntity::class, MessageEntity::class, MemoryEntity::class, DocumentEntity::class],
-    version = 2,
+    entities = [ConversationEntity::class, MessageEntity::class, MemoryEntity::class, DocumentEntity::class, ActionProposalEntity::class],
+    version = 3,
     exportSchema = false
 )
 abstract class BeehalfDatabase : RoomDatabase() {
@@ -36,6 +36,29 @@ abstract class BeehalfDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS action_proposals (
+                        id TEXT NOT NULL,
+                        actionType TEXT NOT NULL,
+                        target TEXT NOT NULL,
+                        detail TEXT NOT NULL,
+                        summary TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        expiresAt INTEGER NOT NULL,
+                        decidedAt INTEGER,
+                        PRIMARY KEY(id)
+                    )
+                    """.trimIndent()
+                )
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_action_proposals_status ON action_proposals(status)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_action_proposals_expiresAt ON action_proposals(expiresAt)")
+            }
+        }
+
         @Volatile private var instance: BeehalfDatabase? = null
 
         fun getInstance(context: Context): BeehalfDatabase =
@@ -44,7 +67,7 @@ abstract class BeehalfDatabase : RoomDatabase() {
                     context.applicationContext,
                     BeehalfDatabase::class.java,
                     "beehalf-local.db"
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }
