@@ -157,10 +157,10 @@ private fun BeehalfHome(
                     Text("Private, local-first AI assistant", style = MaterialTheme.typography.bodySmall)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = { showMemories = !showMemories; showDocuments = false }) { Text(if (showMemories) "Chat" else "Memories") }
+                    TextButton(onClick = { showMemories = !showMemories; showDocuments = false; showApprovals = false }) { Text(if (showMemories) "Chat" else "Memories") }
                     TextButton(onClick = { showDocuments = !showDocuments; showMemories = false; showApprovals = false }) { Text(if (showDocuments) "Chat" else "Documents") }
                     TextButton(onClick = { showApprovals = !showApprovals; showMemories = false; showDocuments = false }) { Text(if (showApprovals) "Chat" else "Approvals") }
-                    if (!showMemories && !showDocuments) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
+                    if (!showMemories && !showDocuments && !showApprovals) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
                 }
             }
 
