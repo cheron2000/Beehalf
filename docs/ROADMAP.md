@@ -10,10 +10,11 @@
 - [ ] Add model picker and inference playground
 
 ## M2 — Persistent memory
-- [ ] Room schema for conversations and messages
+- [x] Room schema for conversations, messages, and categorized memory records
 - [ ] Working memory and rolling summaries
-- [ ] Episodic and semantic memory records
-- [ ] Context builder with token budgeting
+- [ ] Episodic and semantic memory extraction and lifecycle
+- [x] Conversation repository for persistence, retrieval, and deletion
+- [x] Bounded chronological context builder (configurable message/token budgets)
 - [ ] Memory inspection, correction, retention, and deletion UI
 
 ## M3 — Local RAG
