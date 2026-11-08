@@ -56,3 +56,11 @@ Groq chat completions are remote. Any message, summary, memory, or RAG chunk inc
 - A conversation has at most one rolling working summary. The summary repository only incorporates older messages outside the recent-message window and advances a source watermark after successful summarization.
 - Working summaries are local Room memory records and are included as untrusted reference context in later Groq requests. The user can inspect, edit, pin, or delete them in the memory screen.
 - Rolling summary generation is best-effort; failure must not turn an already-saved assistant reply into a failed chat turn.
+
+## Local document ingestion
+
+- Documents are selected through Android's Storage Access Framework using the system document picker; Beehalf does not request broad storage permission.
+- The app takes a persistable read grant and stores the content URI plus display name, MIME type, size (when available), and import timestamp in Room.
+- Duplicate imports of the same URI update the existing document record rather than creating duplicate entries.
+- Removing a document deletes its local metadata record and releases the persisted URI grant where possible.
+- This first ingestion slice stores references only. It does not parse, copy, embed, index, or upload document contents. Parsing and retrieval are separate roadmap steps.
