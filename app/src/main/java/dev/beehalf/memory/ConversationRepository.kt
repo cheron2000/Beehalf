@@ -16,6 +16,11 @@ class ConversationRepository(
     fun observeMessages(conversationId: String): Flow<List<MessageEntity>> =
         dao.observeMessages(conversationId)
 
+    suspend fun getRecentMessages(conversationId: String, limit: Int = 40): List<MessageEntity> {
+        require(limit > 0) { "Message limit must be positive" }
+        return dao.getRecentMessages(conversationId, limit)
+    }
+
     suspend fun createConversation(title: String = "New conversation"): String {
         val now = clock()
         val id = newId()
