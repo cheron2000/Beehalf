@@ -8,6 +8,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BeehalfDao {
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertActionProposal(proposal: ActionProposalEntity)
+
+    @Query("SELECT * FROM action_proposals ORDER BY createdAt DESC")
+    fun observeActionProposals(): Flow<List<ActionProposalEntity>>
+
+    @Query("UPDATE action_proposals SET status = 'expired', decidedAt = :now WHERE status = 'pending' AND expiresAt <= :now")
+    suspend fun expireActionProposals(now: Long): Int
+
+    @Query("UPDATE action_proposals SET status = :status, decidedAt = :decidedAt WHERE id = :id AND status = 'pending' AND expiresAt > :decidedAt")
+    suspend fun decideActionProposal(id: String, status: String, decidedAt: Long): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertConversation(conversation: ConversationEntity)
 
