@@ -70,6 +70,9 @@ Groq chat completions are remote. Any message, summary, memory, or RAG chunk inc
 
 ## Safe automation boundary
 
+- Automation triggers use typed, data-only event envelopes with stable IDs, timestamps, and explicit source categories (user interface, Android notification adapter, scheduled work).
+- Event validation rejects malformed identifiers/timestamps and source/event mismatches. Notification events carry package/key metadata only, not notification message text.
+- Accepted events may be routed to a handler only; event acceptance is not action approval and never executes an Android API.
 - Automation requests are represented as typed data proposals, not executable code or arbitrary Android intents.
 - The initial supported proposal types are opening a named app package, creating a reminder, and opening an absolute HTTPS URL. Unsupported action types are rejected.
 - Policy validation is fail-closed: malformed identifiers, summaries, timestamps, package names, reminder times, and non-HTTPS URLs are rejected.
