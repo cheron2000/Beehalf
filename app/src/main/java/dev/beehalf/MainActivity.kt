@@ -45,6 +45,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.beehalf.ai.groq.GroqClient
 import dev.beehalf.chat.ChatViewModel
 import dev.beehalf.data.local.BeehalfDatabase
+import dev.beehalf.data.DocumentRepository
+import dev.beehalf.ui.DocumentScreen
 import dev.beehalf.memory.ConversationRepository
 import dev.beehalf.memory.MemoryRepository
 import dev.beehalf.memory.ConversationSummaryRepository
@@ -61,6 +63,7 @@ class MainActivity : ComponentActivity() {
         val repository = ConversationRepository(dao)
         val memoryRepository = MemoryRepository(dao)
         val summaryRepository = ConversationSummaryRepository(dao)
+        val documentRepository = DocumentRepository(dao)
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -74,7 +77,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    BeehalfHome(vault = vault, factory = factory, memoryRepository = memoryRepository)
+                    BeehalfHome(vault = vault, factory = factory, memoryRepository = memoryRepository, documentRepository = documentRepository)
                 }
             }
         }
@@ -85,13 +88,15 @@ class MainActivity : ComponentActivity() {
 private fun BeehalfHome(
     vault: ApiKeyVault,
     factory: ViewModelProvider.Factory,
-    memoryRepository: MemoryRepository
+    memoryRepository: MemoryRepository,
+    documentRepository: DocumentRepository
 ) {
     val chatViewModel: ChatViewModel = viewModel(factory = factory)
     val state by chatViewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     var showMemories by remember { mutableStateOf(false) }
+    var showDocuments by remember { mutableStateOf(false) }
 
     var apiKey by remember { mutableStateOf("") }
     var providerModel by remember { mutableStateOf("llama-3.3-70b-versatile") }
@@ -109,7 +114,7 @@ private fun BeehalfHome(
 
     Scaffold(
         bottomBar = {
-            if (!showMemories) {
+            if (!showMemories && !showDocuments) {
             Surface(shadowElevation = 4.dp) {
                 Row(
                     modifier = Modifier.fillMaxWidth().imePadding().padding(12.dp),
@@ -147,13 +152,16 @@ private fun BeehalfHome(
                     Text("Private, local-first AI assistant", style = MaterialTheme.typography.bodySmall)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = { showMemories = !showMemories }) { Text(if (showMemories) "Chat" else "Memories") }
-                    if (!showMemories) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
+                    TextButton(onClick = { showMemories = !showMemories; showDocuments = false }) { Text(if (showMemories) "Chat" else "Memories") }
+                    TextButton(onClick = { showDocuments = !showDocuments; showMemories = false }) { Text(if (showDocuments) "Chat" else "Documents") }
+                    if (!showMemories && !showDocuments) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
                 }
             }
 
             if (showMemories) {
                 MemoryScreen(repository = memoryRepository, messages = state.messages, conversationId = state.selectedConversationId, vault = vault)
+            } else if (showDocuments) {
+                DocumentScreen(repository = documentRepository)
             } else {
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
