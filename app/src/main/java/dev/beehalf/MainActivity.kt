@@ -151,7 +151,7 @@ private fun BeehalfHome(
             }
 
             if (showMemories) {
-                MemoryScreen(repository = memoryRepository)
+                MemoryScreen(repository = memoryRepository, messages = state.messages, conversationId = state.selectedConversationId, vault = vault)
             } else {
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
