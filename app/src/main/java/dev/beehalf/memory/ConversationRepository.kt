@@ -40,8 +40,10 @@ class ConversationRepository(
             content = content.trim(),
             createdAt = clock()
         )
+        val isFirstMessage = dao.countMessages(conversationId) == 0
         dao.insertMessage(message)
-        dao.touchConversation(conversationId, message.createdAt)
+        val title = if (isFirstMessage && role == "user") content.trim().replace(Regex("\\s+"), " ").take(36) else "New conversation"
+        dao.updateConversationAfterMessage(conversationId, message.createdAt, title)
         return message
     }
 
