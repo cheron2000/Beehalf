@@ -42,7 +42,7 @@ class ConversationRepository(
         )
         val isFirstMessage = dao.countMessages(conversationId) == 0
         dao.insertMessage(message)
-        val title = if (isFirstMessage && role == "user") content.trim().replace(Regex("\\s+"), " ").take(36) else "New conversation"
+        val title = if (isFirstMessage && role == "user") content.trim().replace(Regex("\\s+"), " ").take(36) else ""
         dao.updateConversationAfterMessage(conversationId, message.createdAt, title)
         return message
     }
