@@ -3,6 +3,7 @@ package dev.beehalf.memory
 import dev.beehalf.ai.groq.GroqClient
 import dev.beehalf.data.local.BeehalfDao
 import dev.beehalf.data.local.ConversationEntity
+import dev.beehalf.data.local.DocumentEntity
 import dev.beehalf.data.local.MemoryEntity
 import dev.beehalf.data.local.MessageEntity
 import kotlinx.coroutines.flow.Flow
@@ -75,6 +76,10 @@ private class FakeSummaryDao(
     val memories = linkedMapOf<String, MemoryEntity>()
     override suspend fun upsertConversation(conversation: ConversationEntity) = Unit
     override suspend fun insertMessage(message: MessageEntity) = Unit
+    override suspend fun upsertDocument(document: DocumentEntity) = Unit
+    override fun observeDocuments(): Flow<List<DocumentEntity>> = MutableStateFlow(emptyList())
+    override suspend fun getDocumentByUri(uri: String): DocumentEntity? = null
+    override suspend fun deleteDocument(documentId: String) = Unit
     override suspend fun upsertMemory(memory: MemoryEntity) { memories[memory.id] = memory }
     override fun observeConversations(): Flow<List<ConversationEntity>> = MutableStateFlow(emptyList())
     override fun observeMessages(conversationId: String): Flow<List<MessageEntity>> = MutableStateFlow(emptyList())
