@@ -1,6 +1,7 @@
 package dev.beehalf.memory
 
 import dev.beehalf.ai.groq.GroqClient
+import dev.beehalf.data.local.ActionProposalEntity
 import dev.beehalf.data.local.BeehalfDao
 import dev.beehalf.data.local.ConversationEntity
 import dev.beehalf.data.local.DocumentEntity
@@ -74,6 +75,10 @@ private class FakeSummaryDao(
     private val messages: List<MessageEntity>
 ) : BeehalfDao {
     val memories = linkedMapOf<String, MemoryEntity>()
+    override suspend fun insertActionProposal(proposal: ActionProposalEntity) = Unit
+    override fun observeActionProposals(): Flow<List<ActionProposalEntity>> = MutableStateFlow(emptyList())
+    override suspend fun expireActionProposals(now: Long): Int = 0
+    override suspend fun decideActionProposal(id: String, status: String, decidedAt: Long): Int = 0
     override suspend fun upsertConversation(conversation: ConversationEntity) = Unit
     override suspend fun insertMessage(message: MessageEntity) = Unit
     override suspend fun upsertDocument(document: DocumentEntity) = Unit
