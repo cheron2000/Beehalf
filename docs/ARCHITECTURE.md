@@ -79,4 +79,7 @@ Groq chat completions are remote. Any message, summary, memory, or RAG chunk inc
 - A valid policy result means only that a proposal may be shown for approval. It does not grant permission, invoke an Android API, or execute the action.
 - The Android capability checker performs read-only handler discovery for launchable apps, alarm-setting intents, and HTTPS links. It never starts an activity or schedules an alarm.
 - Launcher-app visibility uses a narrow MAIN + LAUNCHER package query; Beehalf does not request QUERY_ALL_PACKAGES.
-- Handler availability is not user consent or runtime authorization. Explicit user approval remains mandatory. The approval queue, idempotent execution, and audit persistence remain subsequent M4 tasks.
+- Handler availability is not user consent or runtime authorization. Explicit user approval remains mandatory.
+- Action proposals are persisted locally in Room with their typed action details, summary, status, creation time, expiry time, and decision timestamp.
+- The approval queue shows the exact package, HTTPS URL, or reminder title/time before presenting approve and reject controls. Proposals expire after 24 hours; stale pending proposals are marked expired and cannot be approved.
+- Approving or rejecting changes only the stored decision state. The approval repository has no Android execution dependency, and approval does not execute an action. Idempotent execution and a separate audit log remain future M4 work.
