@@ -9,7 +9,7 @@
 - [x] GitHub Actions unit-test and debug-build workflow
 - [ ] Add model picker and inference playground
 
-## M2 — Persistent memory
+## M2 — Persistent memory (complete)
 - [x] Persistent chat screen connected to Room
 - [x] Conversation history selection and new conversation creation
 - [x] Groq chat generation using bounded local conversation context
@@ -24,7 +24,7 @@
 - [x] User-selectable retention cleanup for unpinned memories
 
 ## M3 — Local RAG
-- [ ] Android Storage Access Framework import
+- [x] Android Storage Access Framework import and persistent document references
 - [ ] PDF, TXT, Markdown, CSV, JSON, DOCX, and XLSX parsers
 - [ ] Chunking and metadata
 - [ ] On-device embedding runtime
