@@ -44,6 +44,8 @@ fun MemoryScreen(repository: MemoryRepository, messages: List<MessageEntity>, co
     var error by remember { mutableStateOf<String?>(null) }
     var candidates by remember { mutableStateOf<List<MemoryCandidate>>(emptyList()) }
     var extracting by remember { mutableStateOf(false) }
+    var retentionDays by remember { mutableStateOf(180) }
+    var retentionMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
@@ -144,6 +146,22 @@ fun MemoryScreen(repository: MemoryRepository, messages: List<MessageEntity>, co
             }
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+
+        Text("Retention", style = MaterialTheme.typography.titleMedium)
+        Text("Remove unpinned memories older than the selected period. Pinned memories and working summaries are kept.", style = MaterialTheme.typography.bodySmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf(30, 90, 180, 365).forEach { days ->
+                FilterChip(selected = retentionDays == days, onClick = { retentionDays = days }, label = { Text("$days days") })
+            }
+        }
+        Button(onClick = {
+            scope.launch {
+                val cutoff = System.currentTimeMillis() - retentionDays.toLong() * 24L * 60L * 60L * 1000L
+                val deleted = repository.applyRetention(cutoff)
+                retentionMessage = "$deleted unpinned memories removed."
+            }
+        }) { Text("Apply retention") }
+        retentionMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
 
         Text("Your memories (${memories.size})", style = MaterialTheme.typography.titleMedium)
         if (memories.isEmpty()) {
