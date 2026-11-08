@@ -9,6 +9,7 @@ import dev.beehalf.data.local.MessageEntity
 import dev.beehalf.memory.ContextWindowBuilder
 import dev.beehalf.memory.ConversationRepository
 import dev.beehalf.security.ApiKeyVault
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +88,7 @@ class ChatViewModel(
         val conversationId = current.selectedConversationId ?: return
         if (text.isBlank() || current.isSending) return
 
-        mutableState.update { it.copy(draft = "", isSending = true, error = null) }
+        mutableState.update { it.copy(isSending = true, error = null) }
         viewModelScope.launch {
             try {
                 val apiKey = withContext(Dispatchers.IO) { apiKeyVault.read() }
@@ -97,6 +98,7 @@ class ChatViewModel(
                 }
 
                 repository.appendMessage(conversationId, "user", text)
+                mutableState.update { it.copy(draft = "") }
                 val history = repository.getRecentMessages(conversationId, limit = 40)
                 val boundedContext = contextWindowBuilder.build(history)
                 val prompt = buildList {
@@ -109,7 +111,9 @@ class ChatViewModel(
                     messages = prompt
                 )
                 repository.appendMessage(conversationId, "assistant", answer)
-            } catch (exception: Exception) {
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
                 mutableState.update {
                     it.copy(error = "Message could not be sent. Check your connection, API key, and model ID.")
                 }
