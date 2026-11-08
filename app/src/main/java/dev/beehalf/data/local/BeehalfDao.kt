@@ -44,6 +44,6 @@ interface BeehalfDao {
     @Query("DELETE FROM memories WHERE id = :memoryId")
     suspend fun deleteMemory(memoryId: String)
 
-    @Query("UPDATE conversations SET updatedAt = :updatedAt WHERE id = :conversationId")
-    suspend fun touchConversation(conversationId: String, updatedAt: Long)
+    @Query("UPDATE conversations SET updatedAt = :updatedAt, title = :title WHERE id = :conversationId")
+    suspend fun updateConversationAfterMessage(conversationId: String, updatedAt: Long, title: String)
 }
