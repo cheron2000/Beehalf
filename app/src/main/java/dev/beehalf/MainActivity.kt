@@ -264,6 +264,7 @@ private fun BeehalfHome(
         }
     }
 }
+}
 
 @Composable
 private fun MessageBubble(role: String, content: String) {
