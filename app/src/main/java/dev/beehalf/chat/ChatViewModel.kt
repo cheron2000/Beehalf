@@ -9,6 +9,7 @@ import dev.beehalf.data.local.MessageEntity
 import dev.beehalf.memory.ContextWindowBuilder
 import dev.beehalf.memory.ConversationRepository
 import dev.beehalf.memory.MemoryRepository
+import dev.beehalf.memory.ConversationSummaryRepository
 import dev.beehalf.security.ApiKeyVault
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,7 @@ data class ChatUiState(
 class ChatViewModel(
     private val repository: ConversationRepository,
     private val memoryRepository: MemoryRepository,
+    private val summaryRepository: ConversationSummaryRepository,
     private val apiKeyVault: ApiKeyVault,
     private val groqClient: GroqClient = GroqClient(),
     private val contextWindowBuilder: ContextWindowBuilder = ContextWindowBuilder()
@@ -130,6 +132,13 @@ class ChatViewModel(
                     messages = prompt
                 )
                 repository.appendMessage(conversationId, "assistant", answer)
+                try {
+                    summaryRepository.refresh(apiKey, conversationId)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    // Summary refresh is best-effort; a saved assistant reply remains successful.
+                }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {

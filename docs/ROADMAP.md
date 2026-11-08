@@ -15,13 +15,13 @@
 - [x] Groq chat generation using bounded local conversation context
 - [x] Provider settings retained in the chat experience
 - [x] Room schema for conversations, messages, and categorized memory records
-- [ ] Working memory and rolling summaries
-- [ ] Episodic and semantic memory extraction and lifecycle
+- [x] Working memory and incremental rolling conversation summaries
+- [x] Reviewable episodic and semantic memory suggestions with explicit user approval
 - [x] Conversation repository for persistence, retrieval, and deletion
 - [x] Bounded chronological context builder (configurable message/token budgets)
 - [x] Memory inspection, manual correction, pinning, and deletion UI
 - [x] Memory repository validation, bounded retrieval, and unpinned retention operation
-- [ ] Retention settings UI and user-configurable retention policy
+- [x] User-selectable retention cleanup for unpinned memories
 
 ## M3 — Local RAG
 - [ ] Android Storage Access Framework import

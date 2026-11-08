@@ -47,3 +47,12 @@ AccessibilityService is not a universal automation bypass. Its use must be narro
 ## Inference boundary
 
 Groq chat completions are remote. Any message, summary, memory, or RAG chunk included in a prompt leaves the device. The context builder must minimize and disclose the data sent. The app must work offline for local data browsing and management, while generation requires connectivity.
+
+## Memory lifecycle
+
+- User-authored memories are stored locally with category, source, confidence, and timestamps.
+- Candidate episodic and semantic memories may be proposed from the selected conversation, but are never persisted automatically. Each candidate requires an explicit user approval action.
+- Candidate extraction is instructed to omit sensitive personal data and rejects malformed, low-confidence, unknown-category, or oversized outputs.
+- A conversation has at most one rolling working summary. The summary repository only incorporates older messages outside the recent-message window and advances a source watermark after successful summarization.
+- Working summaries are local Room memory records and are included as untrusted reference context in later Groq requests. The user can inspect, edit, pin, or delete them in the memory screen.
+- Rolling summary generation is best-effort; failure must not turn an already-saved assistant reply into a failed chat turn.
