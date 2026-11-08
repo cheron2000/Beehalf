@@ -67,6 +67,7 @@ private class FakeMemoryDao : BeehalfDao {
     override fun observeConversations(): Flow<List<ConversationEntity>> = MutableStateFlow(emptyList())
     override fun observeMessages(conversationId: String): Flow<List<MessageEntity>> = MutableStateFlow(emptyList())
     override suspend fun getRecentMessages(conversationId: String, limit: Int): List<MessageEntity> = emptyList()
+    override suspend fun getMessagesForSummary(conversationId: String, afterExclusive: Long, beforeExclusive: Long): List<MessageEntity> = emptyList()
     override suspend fun countMessages(conversationId: String): Int = 0
     override fun observeMemories(): Flow<List<MemoryEntity>> = memoryFlow
     override fun observeMemoriesByCategory(category: String): Flow<List<MemoryEntity>> =
