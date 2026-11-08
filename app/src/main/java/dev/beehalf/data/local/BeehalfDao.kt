@@ -17,6 +17,18 @@ interface BeehalfDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertMemory(memory: MemoryEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertDocument(document: DocumentEntity)
+
+    @Query("SELECT * FROM documents ORDER BY importedAt DESC")
+    fun observeDocuments(): Flow<List<DocumentEntity>>
+
+    @Query("SELECT * FROM documents WHERE uri = :uri LIMIT 1")
+    suspend fun getDocumentByUri(uri: String): DocumentEntity?
+
+    @Query("DELETE FROM documents WHERE id = :documentId")
+    suspend fun deleteDocument(documentId: String)
+
     @Query("SELECT * FROM conversations WHERE archived = 0 ORDER BY updatedAt DESC")
     fun observeConversations(): Flow<List<ConversationEntity>>
 
