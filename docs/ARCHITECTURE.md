@@ -63,4 +63,7 @@ Groq chat completions are remote. Any message, summary, memory, or RAG chunk inc
 - The app takes a persistable read grant and stores the content URI plus display name, MIME type, size (when available), and import timestamp in Room.
 - Duplicate imports of the same URI update the existing document record rather than creating duplicate entries.
 - Removing a document deletes its local metadata record and releases the persisted URI grant where possible.
-- This first ingestion slice stores references only. It does not parse, copy, embed, index, or upload document contents. Parsing and retrieval are separate roadmap steps.
+- SAF imports retain a persistent read-only URI grant and local metadata; document contents are opened only when the user requests reading.
+- TXT and Markdown parsing currently runs on-device with a 2 MB input limit, UTF-8/UTF-16 BOM handling, line-ending normalization, and binary-content rejection. Markdown source is preserved rather than rendered so headings, lists, and code fences remain available to future chunking.
+- The current UI preview is capped at 12,000 characters. Parsed content is not persisted, embedded, indexed, or uploaded in this parser slice.
+- PDF, CSV, JSON, DOCX, and XLSX parsing, chunking, embeddings, and retrieval remain separate roadmap work.
