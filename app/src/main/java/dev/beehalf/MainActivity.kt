@@ -46,6 +46,7 @@ import dev.beehalf.ai.groq.GroqClient
 import dev.beehalf.chat.ChatViewModel
 import dev.beehalf.data.local.BeehalfDatabase
 import dev.beehalf.memory.ConversationRepository
+import dev.beehalf.memory.MemoryRepository
 import dev.beehalf.security.ApiKeyVault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,12 +56,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val vault = ApiKeyVault(applicationContext)
-        val repository = ConversationRepository(BeehalfDatabase.getInstance(applicationContext).beehalfDao())
+        val dao = BeehalfDatabase.getInstance(applicationContext).beehalfDao()
+        val repository = ConversationRepository(dao)
+        val memoryRepository = MemoryRepository(dao)
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-                    return ChatViewModel(repository, vault) as T
+                    return ChatViewModel(repository, memoryRepository, vault) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
@@ -69,7 +72,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    BeehalfHome(vault = vault, factory = factory)
+                    BeehalfHome(vault = vault, factory = factory, memoryRepository = memoryRepository)
                 }
             }
         }
@@ -79,12 +82,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun BeehalfHome(
     vault: ApiKeyVault,
-    factory: ViewModelProvider.Factory
+    factory: ViewModelProvider.Factory,
+    memoryRepository: MemoryRepository
 ) {
     val chatViewModel: ChatViewModel = viewModel(factory = factory)
     val state by chatViewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    var showMemories by remember { mutableStateOf(false) }
 
     var apiKey by remember { mutableStateOf("") }
     var providerModel by remember { mutableStateOf("llama-3.3-70b-versatile") }
@@ -102,6 +107,7 @@ private fun BeehalfHome(
 
     Scaffold(
         bottomBar = {
+            if (!showMemories) {
             Surface(shadowElevation = 4.dp) {
                 Row(
                     modifier = Modifier.fillMaxWidth().imePadding().padding(12.dp),
@@ -122,6 +128,7 @@ private fun BeehalfHome(
                     ) { Text(if (state.isSending) "…" else "Send") }
                 }
             }
+            }
         }
     ) { innerPadding ->
         Column(
@@ -137,9 +144,15 @@ private fun BeehalfHome(
                     Text("Beehalf", style = MaterialTheme.typography.headlineMedium)
                     Text("Private, local-first AI assistant", style = MaterialTheme.typography.bodySmall)
                 }
-                TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(onClick = { showMemories = !showMemories }) { Text(if (showMemories) "Chat" else "Memories") }
+                    if (!showMemories) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
+                }
             }
 
+            if (showMemories) {
+                MemoryScreen(repository = memoryRepository, messages = state.messages, conversationId = state.selectedConversationId, vault = vault)
+            } else {
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -250,6 +263,7 @@ private fun BeehalfHome(
             }
         }
     }
+}
 }
 
 @Composable

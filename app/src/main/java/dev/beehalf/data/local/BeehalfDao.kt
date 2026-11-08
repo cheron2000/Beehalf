@@ -32,6 +32,18 @@ interface BeehalfDao {
     @Query("SELECT * FROM memories ORDER BY pinned DESC, updatedAt DESC")
     fun observeMemories(): Flow<List<MemoryEntity>>
 
+    @Query("SELECT * FROM memories WHERE id = :memoryId LIMIT 1")
+    suspend fun getMemory(memoryId: String): MemoryEntity?
+
+    @Query("SELECT * FROM memories ORDER BY pinned DESC, updatedAt DESC LIMIT :limit")
+    suspend fun getMemoriesForContext(limit: Int): List<MemoryEntity>
+
+    @Query("SELECT * FROM memories WHERE category = :category ORDER BY pinned DESC, updatedAt DESC LIMIT :limit")
+    suspend fun getMemoriesByCategory(category: String, limit: Int): List<MemoryEntity>
+
+    @Query("DELETE FROM memories WHERE updatedAt < :cutoff AND pinned = 0")
+    suspend fun deleteUnpinnedMemoriesBefore(cutoff: Long): Int
+
     @Query("SELECT * FROM memories WHERE category = :category ORDER BY pinned DESC, updatedAt DESC")
     fun observeMemoriesByCategory(category: String): Flow<List<MemoryEntity>>
 

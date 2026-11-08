@@ -19,7 +19,9 @@
 - [ ] Episodic and semantic memory extraction and lifecycle
 - [x] Conversation repository for persistence, retrieval, and deletion
 - [x] Bounded chronological context builder (configurable message/token budgets)
-- [ ] Memory inspection, correction, retention, and deletion UI
+- [x] Memory inspection, manual correction, pinning, and deletion UI
+- [x] Memory repository validation, bounded retrieval, and unpinned retention operation
+- [ ] Retention settings UI and user-configurable retention policy
 
 ## M3 — Local RAG
 - [ ] Android Storage Access Framework import
