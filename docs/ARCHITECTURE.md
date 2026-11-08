@@ -21,7 +21,7 @@ Beehalf is an Android-first, local-first automation assistant. It has no user-ma
 1. UI code never executes device actions directly.
 2. LLM output is untrusted data; it cannot bypass action validation.
 3. Every action is represented as a typed proposal and checked by a policy/permission layer.
-4. The initial messaging flow requires explicit user approval before sending.
+4. A valid action proposal is not authorization. Explicit user approval is required before execution.
 5. Notification access is opt-in and must have a clear in-app explanation.
 6. Local documents and memories are not uploaded by default. Only selected context is sent to Groq for inference.
 7. API credentials are user-provided, encrypted at rest with Android Keystore, and never logged.
@@ -67,3 +67,11 @@ Groq chat completions are remote. Any message, summary, memory, or RAG chunk inc
 - TXT and Markdown parsing currently runs on-device with a 2 MB input limit, UTF-8/UTF-16 BOM handling, line-ending normalization, and binary-content rejection. Markdown source is preserved rather than rendered so headings, lists, and code fences remain available to future chunking.
 - The current UI preview is capped at 12,000 characters. Parsed content is not persisted, embedded, indexed, or uploaded in this parser slice.
 - PDF, CSV, JSON, DOCX, and XLSX parsing, chunking, embeddings, and retrieval remain separate roadmap work.
+
+## Safe automation boundary
+
+- Automation requests are represented as typed data proposals, not executable code or arbitrary Android intents.
+- The initial supported proposal types are opening a named app package, creating a reminder, and opening an absolute HTTPS URL. Unsupported action types are rejected.
+- Policy validation is fail-closed: malformed identifiers, summaries, timestamps, package names, reminder times, and non-HTTPS URLs are rejected.
+- A valid policy result means only that a proposal may be shown for approval. It does not grant permission, invoke an Android API, or execute the action.
+- Android permission/capability checks, a visible approval queue, idempotent execution, and audit persistence are subsequent M4 tasks.
