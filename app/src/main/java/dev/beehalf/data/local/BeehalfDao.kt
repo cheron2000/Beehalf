@@ -26,6 +26,9 @@ interface BeehalfDao {
     @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY createdAt DESC LIMIT :limit")
     suspend fun getRecentMessages(conversationId: String, limit: Int): List<MessageEntity>
 
+    @Query("SELECT COUNT(*) FROM messages WHERE conversationId = :conversationId")
+    suspend fun countMessages(conversationId: String): Int
+
     @Query("SELECT * FROM memories ORDER BY pinned DESC, updatedAt DESC")
     fun observeMemories(): Flow<List<MemoryEntity>>
 
