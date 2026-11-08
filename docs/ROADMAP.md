@@ -10,6 +10,10 @@
 - [ ] Add model picker and inference playground
 
 ## M2 — Persistent memory
+- [x] Persistent chat screen connected to Room
+- [x] Conversation history selection and new conversation creation
+- [x] Groq chat generation using bounded local conversation context
+- [x] Provider settings retained in the chat experience
 - [x] Room schema for conversations, messages, and categorized memory records
 - [ ] Working memory and rolling summaries
 - [ ] Episodic and semantic memory extraction and lifecycle
