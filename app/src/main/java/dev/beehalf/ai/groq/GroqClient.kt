@@ -19,12 +19,13 @@ class GroqClient(
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .callTimeout(75, TimeUnit.SECONDS)
-        .build()
+        .build(),
+    private val baseUrl: String = "https://api.groq.com/openai/v1"
 ) {
     suspend fun validate(apiKey: String): List<String> = withContext(Dispatchers.IO) {
         require(apiKey.isNotBlank()) { "API key is required" }
         val request = Request.Builder()
-            .url("https://api.groq.com/openai/v1/models")
+            .url("$baseUrl/models")
             .header("Authorization", "Bearer $apiKey")
             .get()
             .build()
@@ -52,6 +53,7 @@ class GroqClient(
         require(apiKey.isNotBlank()) { "API key is required" }
         require(model.isNotBlank()) { "Model ID is required" }
         require(messages.isNotEmpty()) { "At least one message is required" }
+        require(temperature in 0.0..2.0) { "Temperature must be between 0 and 2" }
 
         val payload = JSONObject()
             .put("model", model)
@@ -63,7 +65,7 @@ class GroqClient(
             })
 
         val request = Request.Builder()
-            .url("https://api.groq.com/openai/v1/chat/completions")
+            .url("$baseUrl/chat/completions")
             .header("Authorization", "Bearer $apiKey")
             .header("Content-Type", "application/json")
             .post(payload.toString().toRequestBody("application/json".toMediaType()))
