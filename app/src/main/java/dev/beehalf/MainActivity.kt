@@ -88,7 +88,8 @@ private fun BeehalfHome(
     val chatViewModel: ChatViewModel = viewModel(factory = factory)
     val state by chatViewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
-    val listState = rememberLazyListState()\n    var showMemories by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    var showMemories by remember { mutableStateOf(false) }
 
     var apiKey by remember { mutableStateOf("") }
     var providerModel by remember { mutableStateOf("llama-3.3-70b-versatile") }
@@ -141,9 +142,15 @@ private fun BeehalfHome(
                     Text("Beehalf", style = MaterialTheme.typography.headlineMedium)
                     Text("Private, local-first AI assistant", style = MaterialTheme.typography.bodySmall)
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {\n                    TextButton(onClick = { showMemories = !showMemories }) { Text(if (showMemories) "Chat" else "Memories") }\n                    if (!showMemories) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }\n                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(onClick = { showMemories = !showMemories }) { Text(if (showMemories) "Chat" else "Memories") }
+                    if (!showMemories) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
+                }
             }
 
+            if (showMemories) {
+                MemoryScreen(repository = memoryRepository)
+            } else {
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
