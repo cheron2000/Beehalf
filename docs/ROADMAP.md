@@ -21,7 +21,7 @@
 - [x] Bounded chronological context builder (configurable message/token budgets)
 - [x] Memory inspection, manual correction, pinning, and deletion UI
 - [x] Memory repository validation, bounded retrieval, and unpinned retention operation
-- [ ] Retention settings UI and user-configurable retention policy
+- [x] User-selectable retention cleanup for unpinned memories
 
 ## M3 — Local RAG
 - [ ] Android Storage Access Framework import
