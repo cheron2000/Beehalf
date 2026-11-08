@@ -26,6 +26,9 @@ interface BeehalfDao {
     @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY createdAt DESC LIMIT :limit")
     suspend fun getRecentMessages(conversationId: String, limit: Int): List<MessageEntity>
 
+    @Query("SELECT * FROM messages WHERE conversationId = :conversationId AND createdAt > :afterExclusive AND createdAt < :beforeExclusive ORDER BY createdAt ASC")
+    suspend fun getMessagesForSummary(conversationId: String, afterExclusive: Long, beforeExclusive: Long): List<MessageEntity>
+
     @Query("SELECT COUNT(*) FROM messages WHERE conversationId = :conversationId")
     suspend fun countMessages(conversationId: String): Int
 
