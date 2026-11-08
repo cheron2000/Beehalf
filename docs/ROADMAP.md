@@ -5,7 +5,8 @@
 - [x] Compose landing screen
 - [x] Groq BYOK connection validation
 - [x] Android Keystore-backed API key vault
-- [ ] Add automated tests and CI build
+- [x] Groq client unit tests (MockWebServer)
+- [x] GitHub Actions unit-test and debug-build workflow (first run pending)
 - [ ] Add model picker and inference playground
 
 ## M2 — Persistent memory
