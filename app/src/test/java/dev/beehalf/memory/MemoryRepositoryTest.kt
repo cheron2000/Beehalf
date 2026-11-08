@@ -1,5 +1,6 @@
 package dev.beehalf.memory
 
+import dev.beehalf.data.local.ActionProposalEntity
 import dev.beehalf.data.local.BeehalfDao
 import dev.beehalf.data.local.ConversationEntity
 import dev.beehalf.data.local.DocumentEntity
@@ -59,6 +60,10 @@ private class FakeMemoryDao : BeehalfDao {
     val memories = linkedMapOf<String, MemoryEntity>()
     private val memoryFlow = MutableStateFlow<List<MemoryEntity>>(emptyList())
 
+    override suspend fun insertActionProposal(proposal: ActionProposalEntity) = Unit
+    override fun observeActionProposals(): Flow<List<ActionProposalEntity>> = MutableStateFlow(emptyList())
+    override suspend fun expireActionProposals(now: Long): Int = 0
+    override suspend fun decideActionProposal(id: String, status: String, decidedAt: Long): Int = 0
     override suspend fun upsertConversation(conversation: ConversationEntity) = Unit
     override suspend fun insertMessage(message: MessageEntity) = Unit
     override suspend fun upsertDocument(document: DocumentEntity) = Unit
