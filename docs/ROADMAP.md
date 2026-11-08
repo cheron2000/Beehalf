@@ -37,7 +37,7 @@
 - [x] Fail-closed action policy validation; valid proposals require explicit approval
 - [x] Typed event contracts with source validation
 - [x] Android capability checks for launchable apps, alarm handlers, and HTTPS handlers
-- [ ] User approval queue
+- [x] Persistent user approval queue with explicit approve/reject decisions and 24-hour expiry
 - [ ] Idempotency and audit log
 - [ ] Workflow configuration and kill switch
 
