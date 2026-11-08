@@ -43,10 +43,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.beehalf.ai.groq.GroqClient
+import dev.beehalf.automation.ActionApprovalRepository
 import dev.beehalf.chat.ChatViewModel
 import dev.beehalf.data.local.BeehalfDatabase
 import dev.beehalf.data.DocumentRepository
 import dev.beehalf.ui.DocumentScreen
+import dev.beehalf.ui.ApprovalQueueScreen
 import dev.beehalf.memory.ConversationRepository
 import dev.beehalf.memory.MemoryRepository
 import dev.beehalf.memory.ConversationSummaryRepository
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
         val memoryRepository = MemoryRepository(dao)
         val summaryRepository = ConversationSummaryRepository(dao)
         val documentRepository = DocumentRepository(dao)
+        val approvalRepository = ActionApprovalRepository(dao)
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -77,7 +80,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    BeehalfHome(vault = vault, factory = factory, memoryRepository = memoryRepository, documentRepository = documentRepository)
+                    BeehalfHome(vault = vault, factory = factory, memoryRepository = memoryRepository, documentRepository = documentRepository, approvalRepository = approvalRepository)
                 }
             }
         }
@@ -89,7 +92,8 @@ private fun BeehalfHome(
     vault: ApiKeyVault,
     factory: ViewModelProvider.Factory,
     memoryRepository: MemoryRepository,
-    documentRepository: DocumentRepository
+    documentRepository: DocumentRepository,
+    approvalRepository: ActionApprovalRepository
 ) {
     val chatViewModel: ChatViewModel = viewModel(factory = factory)
     val state by chatViewModel.state.collectAsState()
@@ -97,6 +101,7 @@ private fun BeehalfHome(
     val listState = rememberLazyListState()
     var showMemories by remember { mutableStateOf(false) }
     var showDocuments by remember { mutableStateOf(false) }
+    var showApprovals by remember { mutableStateOf(false) }
 
     var apiKey by remember { mutableStateOf("") }
     var providerModel by remember { mutableStateOf("llama-3.3-70b-versatile") }
@@ -114,7 +119,7 @@ private fun BeehalfHome(
 
     Scaffold(
         bottomBar = {
-            if (!showMemories && !showDocuments) {
+            if (!showMemories && !showDocuments && !showApprovals) {
             Surface(shadowElevation = 4.dp) {
                 Row(
                     modifier = Modifier.fillMaxWidth().imePadding().padding(12.dp),
@@ -153,7 +158,8 @@ private fun BeehalfHome(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextButton(onClick = { showMemories = !showMemories; showDocuments = false }) { Text(if (showMemories) "Chat" else "Memories") }
-                    TextButton(onClick = { showDocuments = !showDocuments; showMemories = false }) { Text(if (showDocuments) "Chat" else "Documents") }
+                    TextButton(onClick = { showDocuments = !showDocuments; showMemories = false; showApprovals = false }) { Text(if (showDocuments) "Chat" else "Documents") }
+                    TextButton(onClick = { showApprovals = !showApprovals; showMemories = false; showDocuments = false }) { Text(if (showApprovals) "Chat" else "Approvals") }
                     if (!showMemories && !showDocuments) TextButton(onClick = chatViewModel::startNewConversation) { Text("New chat") }
                 }
             }
@@ -162,6 +168,8 @@ private fun BeehalfHome(
                 MemoryScreen(repository = memoryRepository, messages = state.messages, conversationId = state.selectedConversationId, vault = vault)
             } else if (showDocuments) {
                 DocumentScreen(repository = documentRepository)
+            } else if (showApprovals) {
+                ApprovalQueueScreen(repository = approvalRepository)
             } else {
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
