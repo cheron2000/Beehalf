@@ -36,7 +36,7 @@
 - [x] Typed action proposal contracts (open app, create reminder, open HTTPS page)
 - [x] Fail-closed action policy validation; valid proposals require explicit approval
 - [ ] Typed event contracts
-- [ ] Android permission checks and capability registry
+- [x] Android capability checks for launchable apps, alarm handlers, and HTTPS handlers
 - [ ] User approval queue
 - [ ] Idempotency and audit log
 - [ ] Workflow configuration and kill switch
