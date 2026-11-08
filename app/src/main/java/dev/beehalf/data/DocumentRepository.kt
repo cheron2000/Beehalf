@@ -6,9 +6,11 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import dev.beehalf.data.local.BeehalfDao
 import dev.beehalf.data.local.DocumentEntity
+import dev.beehalf.rag.TextDocumentParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.util.UUID
 
 class DocumentRepository(private val dao: BeehalfDao) {
@@ -30,6 +32,16 @@ class DocumentRepository(private val dao: BeehalfDao) {
         dao.upsertDocument(document)
         document
     }
+
+    suspend fun readTextContent(context: Context, document: DocumentEntity): String =
+        withContext(Dispatchers.IO) {
+            val uri = Uri.parse(document.uri)
+            val stream = context.contentResolver.openInputStream(uri)
+                ?: throw IOException("Could not open the selected document.")
+            stream.use {
+                TextDocumentParser.parse(document.displayName, document.mimeType, it)
+            }
+        }
 
     suspend fun remove(context: Context, document: DocumentEntity) = withContext(Dispatchers.IO) {
         dao.deleteDocument(document.id)
