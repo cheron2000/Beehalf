@@ -87,12 +87,12 @@ fun MemoryScreen(repository: MemoryRepository, messages: List<MessageEntity>, co
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(candidate.content, style = MaterialTheme.typography.bodyLarge)
-                    Text("\${candidate.category.displayName} · confidence \${(candidate.confidence * 100).toInt()}%", style = MaterialTheme.typography.bodySmall)
+                    Text("${candidate.category.displayName} · confidence ${(candidate.confidence * 100).toInt()}%", style = MaterialTheme.typography.bodySmall)
                     if (candidate.rationale.isNotBlank()) Text(candidate.rationale, style = MaterialTheme.typography.bodySmall)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         TextButton(onClick = {
                             scope.launch {
-                                repository.save(MemoryDraft(candidate.content, candidate.category, "conversation:\${conversationId ?: "unknown"}", candidate.confidence))
+                                repository.save(MemoryDraft(candidate.content, candidate.category, "conversation:${conversationId ?: "unknown"}", candidate.confidence))
                                 candidates = candidates.filterIndexed { candidateIndex, _ -> candidateIndex != index }
                             }
                         }) { Text("Approve & save") }
