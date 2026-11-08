@@ -35,6 +35,15 @@ Notification access can expose only notifications made available by Android and 
 
 AccessibilityService is not a universal automation bypass. Its use must be narrowly scoped, transparent, user-enabled, and compliant with Android and Google Play policy. The first release prioritizes notification-based suggestions and user-approved supported replies.
 
+## Conversation and context flow
+
+- Conversations and messages are persisted in the local Room database.
+- The chat UI observes Room-backed conversation and message streams; switching conversations does not discard history.
+- Before a Groq request, the context builder selects a configurable bounded recent-message window and restores chronological order.
+- The system instruction is added at request time and is not stored as a conversation message.
+- The API key is read from the Android Keystore-backed vault only when a request is sent.
+- The request context is sent to Groq; local history is not uploaded wholesale.
+
 ## Inference boundary
 
 Groq chat completions are remote. Any message, summary, memory, or RAG chunk included in a prompt leaves the device. The context builder must minimize and disclose the data sent. The app must work offline for local data browsing and management, while generation requires connectivity.

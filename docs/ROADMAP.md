@@ -1,15 +1,19 @@
 # Roadmap
 
-## M1 — Android foundation (current)
+## M1 — Android foundation (complete)
 - [x] Repository and Android application scaffold
 - [x] Compose landing screen
 - [x] Groq BYOK connection validation
 - [x] Android Keystore-backed API key vault
 - [x] Groq client unit tests (MockWebServer)
-- [x] GitHub Actions unit-test and debug-build workflow (first run pending)
+- [x] GitHub Actions unit-test and debug-build workflow
 - [ ] Add model picker and inference playground
 
 ## M2 — Persistent memory
+- [x] Persistent chat screen connected to Room
+- [x] Conversation history selection and new conversation creation
+- [x] Groq chat generation using bounded local conversation context
+- [x] Provider settings retained in the chat experience
 - [x] Room schema for conversations, messages, and categorized memory records
 - [ ] Working memory and rolling summaries
 - [ ] Episodic and semantic memory extraction and lifecycle

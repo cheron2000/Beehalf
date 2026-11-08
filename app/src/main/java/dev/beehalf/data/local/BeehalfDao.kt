@@ -26,6 +26,9 @@ interface BeehalfDao {
     @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY createdAt DESC LIMIT :limit")
     suspend fun getRecentMessages(conversationId: String, limit: Int): List<MessageEntity>
 
+    @Query("SELECT COUNT(*) FROM messages WHERE conversationId = :conversationId")
+    suspend fun countMessages(conversationId: String): Int
+
     @Query("SELECT * FROM memories ORDER BY pinned DESC, updatedAt DESC")
     fun observeMemories(): Flow<List<MemoryEntity>>
 
@@ -41,6 +44,6 @@ interface BeehalfDao {
     @Query("DELETE FROM memories WHERE id = :memoryId")
     suspend fun deleteMemory(memoryId: String)
 
-    @Query("UPDATE conversations SET updatedAt = :updatedAt WHERE id = :conversationId")
-    suspend fun touchConversation(conversationId: String, updatedAt: Long)
+    @Query("UPDATE conversations SET updatedAt = :updatedAt, title = CASE WHEN :title != '' THEN :title ELSE title END WHERE id = :conversationId")
+    suspend fun updateConversationAfterMessage(conversationId: String, updatedAt: Long, title: String)
 }

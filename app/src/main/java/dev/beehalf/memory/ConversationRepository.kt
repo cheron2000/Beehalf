@@ -16,6 +16,11 @@ class ConversationRepository(
     fun observeMessages(conversationId: String): Flow<List<MessageEntity>> =
         dao.observeMessages(conversationId)
 
+    suspend fun getRecentMessages(conversationId: String, limit: Int = 40): List<MessageEntity> {
+        require(limit > 0) { "Message limit must be positive" }
+        return dao.getRecentMessages(conversationId, limit)
+    }
+
     suspend fun createConversation(title: String = "New conversation"): String {
         val now = clock()
         val id = newId()
@@ -35,8 +40,10 @@ class ConversationRepository(
             content = content.trim(),
             createdAt = clock()
         )
+        val isFirstMessage = dao.countMessages(conversationId) == 0
         dao.insertMessage(message)
-        dao.touchConversation(conversationId, message.createdAt)
+        val title = if (isFirstMessage && role == "user") content.trim().replace(Regex("\\s+"), " ").take(36) else ""
+        dao.updateConversationAfterMessage(conversationId, message.createdAt, title)
         return message
     }
 
