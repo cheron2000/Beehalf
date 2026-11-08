@@ -107,6 +107,7 @@ private fun BeehalfHome(
 
     Scaffold(
         bottomBar = {
+            if (!showMemories) {
             Surface(shadowElevation = 4.dp) {
                 Row(
                     modifier = Modifier.fillMaxWidth().imePadding().padding(12.dp),
@@ -126,6 +127,7 @@ private fun BeehalfHome(
                         enabled = state.draft.isNotBlank() && !state.isSending
                     ) { Text(if (state.isSending) "…" else "Send") }
                 }
+            }
             }
         }
     ) { innerPadding ->
