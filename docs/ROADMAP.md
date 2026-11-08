@@ -1,12 +1,12 @@
 # Roadmap
 
-## M1 — Android foundation (current)
+## M1 — Android foundation (complete)
 - [x] Repository and Android application scaffold
 - [x] Compose landing screen
 - [x] Groq BYOK connection validation
 - [x] Android Keystore-backed API key vault
 - [x] Groq client unit tests (MockWebServer)
-- [x] GitHub Actions unit-test and debug-build workflow (first run pending)
+- [x] GitHub Actions unit-test and debug-build workflow
 - [ ] Add model picker and inference playground
 
 ## M2 — Persistent memory
