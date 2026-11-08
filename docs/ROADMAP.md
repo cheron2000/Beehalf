@@ -25,7 +25,8 @@
 
 ## M3 — Local RAG
 - [x] Android Storage Access Framework import and persistent document references
-- [ ] PDF, TXT, Markdown, CSV, JSON, DOCX, and XLSX parsers
+- [x] Bounded on-device TXT and Markdown parsing with UTF-8/UTF-16 BOM handling
+- [ ] PDF, CSV, JSON, DOCX, and XLSX parsers
 - [ ] Chunking and metadata
 - [ ] On-device embedding runtime
 - [ ] Hybrid full-text and vector retrieval
