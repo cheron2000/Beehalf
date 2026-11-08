@@ -2,7 +2,6 @@ package dev.beehalf.rag
 
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.nio.charset.Charset
 
 /**
  * Bounded, on-device extraction for plain-text and Markdown documents.
