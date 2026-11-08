@@ -41,7 +41,9 @@ fun MemoryScreen(repository: MemoryRepository, messages: List<MessageEntity>, co
     var content by remember { mutableStateOf("") }
     var category by remember { mutableStateOf(MemoryCategory.SEMANTIC) }
     var editingId by remember { mutableStateOf<String?>(null) }
-    var error by remember { mutableStateOf<String?>(null) }\n    var candidates by remember { mutableStateOf<List<MemoryCandidate>>(emptyList()) }\n    var extracting by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var candidates by remember { mutableStateOf<List<MemoryCandidate>>(emptyList()) }
+    var extracting by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
@@ -59,7 +61,47 @@ fun MemoryScreen(repository: MemoryRepository, messages: List<MessageEntity>, co
             label = { Text("What should Beehalf remember?") },
             minLines = 2
         )
-        Button(\n            enabled = messages.isNotEmpty() && !extracting,\n            onClick = {\n                scope.launch {\n                    extracting = true\n                    error = null\n                    try {\n                        val key = withContext(Dispatchers.IO) { vault.read() }\n                        if (key.isNullOrBlank()) {\n                            error = "Configure your Groq API key before extracting memories."\n                        } else {\n                            candidates = MemoryCandidateExtractor().propose(key, messages)\n                            if (candidates.isEmpty()) error = "No confident, non-sensitive memories were found."\n                        }\n                    } catch (_: Exception) {\n                        error = "Memory suggestions could not be generated. Check your Groq settings and connection."\n                    } finally {\n                        extracting = false\n                    }\n                }\n            }\n        ) { Text(if (extracting) "Analyzing conversation…" else "Suggest memories from this chat") }\n        candidates.forEachIndexed { index, candidate ->\n            Card(modifier = Modifier.fillMaxWidth()) {\n                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {\n                    Text(candidate.content, style = MaterialTheme.typography.bodyLarge)\n                    Text("\\${candidate.category.displayName} · confidence \\${(candidate.confidence * 100).toInt()}%", style = MaterialTheme.typography.bodySmall)\n                    if (candidate.rationale.isNotBlank()) Text(candidate.rationale, style = MaterialTheme.typography.bodySmall)\n                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {\n                        TextButton(onClick = {\n                            scope.launch {\n                                repository.save(MemoryDraft(candidate.content, candidate.category, "conversation:\\${conversationId ?: "unknown"}", candidate.confidence))\n                                candidates = candidates.filterIndexed { candidateIndex, _ -> candidateIndex != index }\n                            }\n                        }) { Text("Approve & save") }\n                        TextButton(onClick = { candidates = candidates.filterIndexed { candidateIndex, _ -> candidateIndex != index } }) { Text("Dismiss") }\n                    }\n                }\n            }\n        }\n        Text("Category", style = MaterialTheme.typography.labelMedium)
+        Button(
+            enabled = messages.isNotEmpty() && !extracting,
+            onClick = {
+                scope.launch {
+                    extracting = true
+                    error = null
+                    try {
+                        val key = withContext(Dispatchers.IO) { vault.read() }
+                        if (key.isNullOrBlank()) {
+                            error = "Configure your Groq API key before extracting memories."
+                        } else {
+                            candidates = MemoryCandidateExtractor().propose(key, messages)
+                            if (candidates.isEmpty()) error = "No confident, non-sensitive memories were found."
+                        }
+                    } catch (_: Exception) {
+                        error = "Memory suggestions could not be generated. Check your Groq settings and connection."
+                    } finally {
+                        extracting = false
+                    }
+                }
+            }
+        ) { Text(if (extracting) "Analyzing conversation…" else "Suggest memories from this chat") }
+        candidates.forEachIndexed { index, candidate ->
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(candidate.content, style = MaterialTheme.typography.bodyLarge)
+                    Text("\${candidate.category.displayName} · confidence \${(candidate.confidence * 100).toInt()}%", style = MaterialTheme.typography.bodySmall)
+                    if (candidate.rationale.isNotBlank()) Text(candidate.rationale, style = MaterialTheme.typography.bodySmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(onClick = {
+                            scope.launch {
+                                repository.save(MemoryDraft(candidate.content, candidate.category, "conversation:\${conversationId ?: "unknown"}", candidate.confidence))
+                                candidates = candidates.filterIndexed { candidateIndex, _ -> candidateIndex != index }
+                            }
+                        }) { Text("Approve & save") }
+                        TextButton(onClick = { candidates = candidates.filterIndexed { candidateIndex, _ -> candidateIndex != index } }) { Text("Dismiss") }
+                    }
+                }
+            }
+        }
+        Text("Category", style = MaterialTheme.typography.labelMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(MemoryCategory.WORKING, MemoryCategory.EPISODIC, MemoryCategory.SEMANTIC).forEach { option ->
                 FilterChip(
