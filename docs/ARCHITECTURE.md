@@ -74,4 +74,6 @@ Groq chat completions are remote. Any message, summary, memory, or RAG chunk inc
 - The initial supported proposal types are opening a named app package, creating a reminder, and opening an absolute HTTPS URL. Unsupported action types are rejected.
 - Policy validation is fail-closed: malformed identifiers, summaries, timestamps, package names, reminder times, and non-HTTPS URLs are rejected.
 - A valid policy result means only that a proposal may be shown for approval. It does not grant permission, invoke an Android API, or execute the action.
-- Android permission/capability checks, a visible approval queue, idempotent execution, and audit persistence are subsequent M4 tasks.
+- The Android capability checker performs read-only handler discovery for launchable apps, alarm-setting intents, and HTTPS links. It never starts an activity or schedules an alarm.
+- Launcher-app visibility uses a narrow MAIN + LAUNCHER package query; Beehalf does not request QUERY_ALL_PACKAGES.
+- Handler availability is not user consent or runtime authorization. Explicit user approval remains mandatory. The approval queue, idempotent execution, and audit persistence remain subsequent M4 tasks.
