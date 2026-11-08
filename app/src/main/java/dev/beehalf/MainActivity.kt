@@ -47,6 +47,7 @@ import dev.beehalf.chat.ChatViewModel
 import dev.beehalf.data.local.BeehalfDatabase
 import dev.beehalf.memory.ConversationRepository
 import dev.beehalf.memory.MemoryRepository
+import dev.beehalf.memory.ConversationSummaryRepository
 import dev.beehalf.security.ApiKeyVault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,11 +60,12 @@ class MainActivity : ComponentActivity() {
         val dao = BeehalfDatabase.getInstance(applicationContext).beehalfDao()
         val repository = ConversationRepository(dao)
         val memoryRepository = MemoryRepository(dao)
+        val summaryRepository = ConversationSummaryRepository(dao)
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-                    return ChatViewModel(repository, memoryRepository, vault) as T
+                    return ChatViewModel(repository, memoryRepository, summaryRepository, vault) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
