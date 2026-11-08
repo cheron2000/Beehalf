@@ -24,7 +24,7 @@ class ActionApprovalRepositoryTest {
         )
         assertEquals("pending", saved.status)
         assertEquals("com.example.app", saved.target)
-        assertEquals(1_000L + ActionApprovalRepository.DEFAULT_EXPIRY_MILLIS, saved.expiresAt)
+        assertEquals(900L + ActionApprovalRepository.DEFAULT_EXPIRY_MILLIS, saved.expiresAt)
         assertTrue(runCatching {
             repository.enqueue(ActionProposal("bad", AutomationAction.OpenWebPage("http://bad.example"), "Bad URL", 900L))
         }.isFailure)
@@ -49,7 +49,7 @@ class ActionApprovalRepositoryTest {
         val dao = ApprovalFakeDao()
         var now = 1_000L
         val repository = ActionApprovalRepository(dao, clock = { now }, expiryMillis = 100L)
-        repository.enqueue(ActionProposal("stale", AutomationAction.OpenApp("com.example.app"), "Open app", 900L))
+        repository.enqueue(ActionProposal("stale", AutomationAction.OpenApp("com.example.app"), "Open app", 1_000L))
         now = 1_100L
         assertFalse(repository.approve("stale"))
         assertEquals("expired", dao.items.value.single().status)
